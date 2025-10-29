@@ -1,0 +1,50 @@
+# DnaFinder 🧬
+Proyecto de búsqueda de genes usando árboles 4-arios (tries) en lenguaje C.
+
+# Profesor
+- Christian Vásquez Rebolledo
+
+# Integrantes
+- Nicolas Alvarez      
+- Carlos Bedon         
+- Matías Espinosa      
+- Christofer Gutiérrez 
+- Sebastian Ramirez    
+
+## Estructura
+- docs/
+    - Tarea 3 - 17 de noviembre.pdf
+- incs/ -> Define estructuras y declara llamadas a funciones 
+
+    - bio.h : Estructura BioSystem que contiene el puntero a la raíz del árbol (root) y el largo de los genes (gene_length)
+
+    - commands.h : Declara llamadas para ejecutan la lógica de los comandos (ej. cmd_start, cmd_read, cmd_search, etc.)
+
+    - file_utils.h : Declara las funciones de utilidad para la lectura y validación de archivos (ej. read_sequence, validate_sequence).
+    
+    - list.h : Estructura de lista enlazada (List y Node). Se usa en la hoja del árbol para almacenar todas las posiciones donde aparece un gen.
+
+    - trie.h : Estructura de nodo del árbol (TrieNode). Cada nodo tiene cuatro punteros a sus hijos (hijoA, hijoC, hijoG, hijoT) y un puntero a una lista (List *positions) que solo se usa en los nodos hoja.
+
+- src/
+    - bio.c
+    - commands.c
+    - file_utils.c
+    - list.c
+    - main.c
+    - trie.c
+- makefile: 
+    - Compila todos los archivos .c de la carpeta src/, enlazarlos y generar el ejecutable bio.
+    - Incluye clean para borrar, y run para compilar y ejecutar
+- readme
+    - Descripcion del proyecto, profesor, miembros, estructura del proyecto e instrucciones para compilar
+
+## Comando disponible actualmente
+- `>bio start <m>` : Crea un árbol trie de altura `m`.
+
+## Compilar proyecto
+1. Descargar repositorio
+2. Compilar usando el "makefile" con el comando "make".
+    - O usar el comando "gcc -Wall -Wextra -std=c11 -Iincs src\main.c src\bio.c src\trie.c src\list.c src\commands.c src\file_utils.c -o bio"
+    - Una vez compilado, ejecutar el programa con "./bio.exe"
+    - Cuando se termina el uso del programa, eliminar el archivo "bio.exe".
