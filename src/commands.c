@@ -184,7 +184,7 @@ void cmd_search(BioSystem *sys, const char *gene) {
     // Si la hoja no existe o no tiene posiciones, imprimimos -1
     if (leaf == NULL || leaf->positions == NULL || leaf->positions->count == 0) {
         printf("-1\n");
-    
+
     } else {
         // Recorremos la lista de posiciones e imprimimos
         Node* current_pos = leaf->positions->head;
@@ -199,7 +199,7 @@ void cmd_search(BioSystem *sys, const char *gene) {
                 printf(" ");
             }
             
-            // Avanza al siguiente nodo
+            // Avanzamos al siguiente nodo
             current_pos = current_pos->next;
         }
         
