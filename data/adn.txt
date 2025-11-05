@@ -1,1 +1,1 @@
-// aqui va la secuencia de adn a buscar
+TACTAAGAAGC

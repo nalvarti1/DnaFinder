@@ -9,9 +9,8 @@ int main(void) {
     char input[128];
     printf("=== BioFinder ===\n");
     // Instrucciones para el usuario, cuando se implementen más comandos se agregaran aquí
-    printf("Commands available:\n");
-    printf("  >bio start <m>   -> Create trie of height m\n");
-    printf("  >bio exit        -> Exit program\n\n");
+    cmd_help();
+    printf("  Advace: try not use a trie of height more than 13, the initialized is slow\n\n");
 
     // Bucle principal para leer y procesar comandos
     while (1) {
@@ -21,14 +20,11 @@ int main(void) {
 
         // Comando para salir del programa
         if (strncmp(input, "exit", 4) == 0)
-            break;
+            cmd_exit(&sys);
 
         // Llamada a la función para procesar el comando
         process_command(&sys, input);
     }
-
-    // Liberar recursos antes de salir
-    free_bio_system(&sys);
-    printf("Clearing cache and exiting...\n");
+    
     return 0;
 }
