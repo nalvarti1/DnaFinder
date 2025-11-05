@@ -48,3 +48,7 @@ Proyecto de búsqueda de genes usando árboles 4-arios (tries) en lenguaje C.
     - O usar el comando "gcc -Wall -Wextra -std=c11 -Iincs src\main.c src\bio.c src\trie.c src\list.c src\commands.c src\file_utils.c -o bio"
     - Una vez compilado, ejecutar el programa con "./bio.exe"
     - Cuando se termina el uso del programa, eliminar el archivo "bio.exe".
+
+# Problemas principales a resolver
+- Manejo en la logica funtamental de la creacion del arbol:
+    - 

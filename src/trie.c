@@ -20,13 +20,12 @@ TrieNode *create_trie_node(void) {
 TrieNode *create_trie(int depth) {
 
     // --- ESTE ES EL CAMBIO CLAVE ---
-    // Caso Base: (depth == 0). Esta es la HOJA.
-    // Aquí es donde debe estar la lista.
+    // Caso Base: (depth == 0). Este es un nodo HOJA.
     if (depth == 0) {
         TrieNode *leafNode = create_trie_node();
         if (!leafNode) return NULL;
         
-        printf("DEBUG: Creando lista en nodo hoja (depth=0).\n"); // Tu debug
+        //printf("DEBUG: Creando lista en nodo hoja (depth=0).\n"); // DEBUG line
         leafNode->positions = create_list(); 
 
         if (!leafNode->positions) { 
