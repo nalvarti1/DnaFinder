@@ -37,42 +37,42 @@ void process_command(BioSystem *sys, const char *input) {
     // --- Comandos que SÍ necesitan que 'start' se haya ejecutado ---
     else if (sscanf(input, "read %127s", arg) == 1) {
         if (sys->root == NULL) {
-            printf("Error: Tree has not been initialized. Use 'start <m>'\n");
+            printf("Error: El arbol no ha sido inicializado. Usa 'start <m>'\n");
         } else {
             cmd_read(sys, arg);
         }
     }
     else if (sscanf(input, "search %127s", arg) == 1) {
         if (sys->root == NULL) {
-            printf("Error: Tree has not been initialized. Use 'start <m>'\n");
+            printf("Error: El arbol no ha sido inicializado. Usa 'start <m>'\n");
         } else {
             cmd_search(sys, arg);
         }
     }
     else if (strncmp(input, "all", 3) == 0) {
         if (sys->root == NULL) {
-            printf("Error: Tree has not been initialized. Use 'start <m>'\n");
+            printf("Error: El arbol no ha sido inicializado. Usa 'start <m>'\n");
         } else {
             cmd_all(sys);
         }
     }
     else if (strncmp(input, "max", 3) == 0) {
         if (sys->root == NULL) {
-            printf("Error: Tree has not been initialized. Use 'start <m>'\n");
+            printf("Error: El arbol no ha sido inicializado. Usa 'start <m>'\n");
         } else {
             cmd_max(sys);
         }
     }
     else if (strncmp(input, "min", 3) == 0) {
         if (sys->root == NULL) {
-            printf("Error: Tree has not been initialized. Use 'start <m>'\n");
+            printf("Error: El arbol no ha sido inicializado. Usa 'start <m>'\n");
         } else {
             cmd_min(sys);
         }
     } 
     // Si no coincide con nada
     else {
-        printf("Unknown command. Type 'bio help' to see available commands.\n");
+        printf("Comando desconocido. Escribe 'bio help' para ver los comandos disponibles.\n");
     }
 }
 
@@ -80,28 +80,28 @@ void process_command(BioSystem *sys, const char *input) {
 // Implementa el comando "exit" para liberar memoria y salir del programa
 void cmd_exit(BioSystem *sys) {
     free_bio_system(sys);
-    printf("Clearing cache and exiting...\n");
+    printf("Limpiando cache y saliendo del programa...\n");
     exit(0);
 }
 
 //-------------------------------------------------------------------------------------------------------------------
 // Muestra la ayuda con los comandos disponibles
 void cmd_help(void) {
-    printf("\033[0;32m\nAvailable commands:\n\033[0m");
-    printf("  exit          -> Exit the program and clear memory.\n");
-    printf("  start <m>     -> Create trie of height m\n");
-    printf("  read <file>   -> Loads the sequence S from <file> (ej: adn.txt).\n");
-    printf("  search <gen>  -> Searches for <gen> in the sequence S and prints its positions.\n");
-    printf("  all           -> Displays all genes found and their positions.\n");
-    printf("  max           -> Displays the most frequent gene(s) and their positions.\n");
-    printf("  min           -> Displays the least frequent gene(s) and their positions.\n");
+    printf("\033[0;32m\nComandos disponibles:\n\033[0m");
+    printf("  exit          -> Sale del programa y limpia la memoria.\n");
+    printf("  start <m>     -> Crea un arbol de tamano m\n");
+    printf("  read <file>   -> Carga la secuencia S desde <file> (ej: adn.txt o data/adn.txt).\n");
+    printf("  search <gen>  -> Busca un <gen> en la secuencia S e imprime sus posiciones.\n");
+    printf("  all           -> Muestra todos los genes en pantalla y sus posiciones.\n");
+    printf("  max           -> Muestra los genes mas frecuentes y sus posiciones.\n");
+    printf("  min           -> Muestra los genes menos frecuentes y sus posiciones.\n");
 }
 
 //-------------------------------------------------------------------------------------------------------------------
 // Implementa el comando "start <m>" para crear un trie de altura m
 void cmd_start(BioSystem *sys, int m) {
     if (m <= 0) {
-        printf("Error: gene length must be greater than 0.\n");
+        printf("Error: El tamano del arbol debe ser mayor a 0.\n");
         return;
     }
 
@@ -114,9 +114,9 @@ void cmd_start(BioSystem *sys, int m) {
     sys->gene_length = m;
 
     if (sys->root)
-        printf("Tree created with height %d\n", m);
+        printf("Arbol creado con tamano: %d\n", m);
     else
-        printf("Error creating tree.\n");
+        printf("Error creando el arbol.\n");
 }
 
 //-------------------------------------------------------------------------------------------------------------------
@@ -125,13 +125,13 @@ void cmd_read(BioSystem *sys, const char *filename) {
     // Leer el archivo
     char *sequence = read_sequence(filename); // De file_utils.c
     if (!sequence) {
-        printf("Error: Could not read file '%s'\n", filename);
+        printf("Error:No se pudo leer el archivo '%s'\n", filename);
         return;
     }
 
     // Validar la secuencia
     if (!validate_sequence(sequence)) { // De file_utils.c
-        printf("Error: Sequence '%s' contains invalid characters.\n", filename);
+        printf("Error: La secuencia '%s' contiene caracteres invalidos.\n", filename);
         free(sequence);
         return;
     }
@@ -147,7 +147,7 @@ void cmd_read(BioSystem *sys, const char *filename) {
     }
 
     if (n < m) {
-        printf("Error: Sequence (length %d) is shorter than gene length (%d).\n", n, m);
+        printf("Error: La secuencia (longitud %d) es mas corta que la longitud del gen (%d).\n", n, m);
         free(sequence);
         free(sequence);
         return;
@@ -166,13 +166,13 @@ void cmd_read(BioSystem *sys, const char *filename) {
             // Guardamos la posición 'i' en la lista
             add_position(leaf->positions, i);
         } else {
-            printf("Warning: Could not insert gene at position %d.\n", i);
+            printf("Advertencia: No se pudo insertar el gen en la posicion %d.\n", i);
         }
     }
 
     // 4. Liberar memoria y confirmar
     free(sequence); // Ya no necesitamos el string gigante
-    printf("Sequence S read from file %s\n", filename); // [cite: 97]
+    printf("Secuencia S leida desde el archivo %s\n", filename); // [cite: 97]
 }
 
 //-------------------------------------------------------------------------------------------------------------------
@@ -181,7 +181,7 @@ void cmd_search(BioSystem *sys, const char *gene) {
 
     // Validar que el gen tenga la longitud correcta
     if (strlen(gene) != (size_t)sys->gene_length) { 
-        printf("Error: Gene must be of length %d. Gene '%s' has length %zu.\n", 
+        printf("Error: El gen debe tener longitud %d. Gen '%s' tiene longitud %zu.\n", 
                sys->gene_length, gene, strlen(gene));
         return;
     }
@@ -217,9 +217,89 @@ void cmd_search(BioSystem *sys, const char *gene) {
 }
 //-------------------------------------------------------------------------------------------------------------------
 // Mostrar todos los genes encontrados (Sebastian no implementado aún)
+//-------------------------------------------------------------------------------------------------------------------
+// Mostrar todos los genes encontrados (Sebastian)
 void cmd_all(BioSystem *sys) {
-    // Implementación pendiente
-    printf("cmd_all not implemented yet.\n");
+    // Verifica que el sistema este inicializado
+    if (sys->root == NULL) {
+        printf("Error: El arbol no ha sido inicializado. Usa 'start <m>'\n");
+        return;
+    }
+    
+    // Prepara estructuras para recolectar informacion
+    int capacity = 16;     // Capacidad inicial
+    int count = 0;         // Contador de genes encontrados
+    
+    GeneInfo *genes_array = malloc(capacity * sizeof(GeneInfo));
+    if (!genes_array) {
+        printf("Error: Asignacion de memoria fallida.\n");
+        return;
+    }
+    
+    char *gene_buffer = malloc(sys->gene_length + 1);
+    if (!gene_buffer) {
+        free(genes_array);
+        printf("Error: Asignacion de memoria fallida.\n");
+        return;
+    }
+    
+    // Llena el array con todos los genes
+    collect_genes_recursive(sys->root, sys->gene_length, 0, gene_buffer, &genes_array, &count, &capacity);
+    
+    // Verifica si se encontraron genes
+    if (count == 0) {
+        printf("No se encontraron genes en la secuencia.\n");
+        free(gene_buffer);
+        free(genes_array);
+        return;
+    }
+    
+    for (int i = 0; i < count; i++) {
+        // Imprime el nombre del gen
+        printf("%s", genes_array[i].gene); 
+            
+        // Prepara arreglo temporal para ordenar posiciones
+        int *positions_array = malloc(genes_array[i].frequency * sizeof(int));
+        if (!positions_array) {
+            printf("\nError: Asignacion de memoria fallida para las posiciones.\n");
+            continue; 
+        }
+            
+        // Copia posiciones de la lista al array
+        Node *current = genes_array[i].positions->head;
+        int pos_count = 0;
+        while (current != NULL) {
+            positions_array[pos_count++] = current->pos;
+            current = current->next;
+        }
+            
+        // Ordena las posiciones usando bubble sort
+        for (int j = 0; j < pos_count - 1; j++) {
+            for (int k = 0; k < pos_count - j - 1; k++) {
+                if (positions_array[k] > positions_array[k + 1]) {
+                    int temp = positions_array[k];
+                    positions_array[k] = positions_array[k + 1];
+                    positions_array[k + 1] = temp;
+                }
+            }
+        }
+            
+        // Imprime las posiciones ordenadas (ej: " 4 7")
+        for (int j = 0; j < pos_count; j++) {
+            printf(" %d", positions_array[j]);
+        }
+        printf("\n");
+            
+        // Libera array temporal de posiciones
+        free(positions_array);
+    }
+    
+    // Libera toda la memoria asignada
+    for (int i = 0; i < count; i++) {
+        free(genes_array[i].gene);
+    }
+    free(genes_array);
+    free(gene_buffer);
 }
 
 
@@ -247,7 +327,7 @@ void collect_genes_recursive(
                 *capacity *= 2;  // Duplicar capacidad
                 *genes_array = realloc(*genes_array, (*capacity) * sizeof(GeneInfo));
                 if (!(*genes_array)) {
-                    printf("Error: Memory reallocation failed.\n");
+                    printf("Error: Reasignacion de memoria fallida.\n");
                     return;
                 }
             }
@@ -255,7 +335,7 @@ void collect_genes_recursive(
             // Guardar la informacion del gen en el array
             (*genes_array)[*count].gene = malloc(depth + 1);
             if (!(*genes_array)[*count].gene) {
-                printf("Error: Memory allocation failed for gene string.\n");
+                printf("Error: Fallo la asignacion de memoria para el string del gen.\n");
                 return;
             }
             strcpy((*genes_array)[*count].gene, gene_buffer);
@@ -300,7 +380,7 @@ void collect_genes_recursive(
 void cmd_max(BioSystem *sys) {
     // Verificar que el sistema este inicializado
     if (sys->root == NULL) {
-        printf("Error: Tree has not been initialized. Use 'start <m>'\n");
+        printf("Error: El arbol no ha sido inicializado. Usa 'start <m>'\n");
         return;
     }
     
@@ -311,7 +391,7 @@ void cmd_max(BioSystem *sys) {
     // Crear array dinamico para almacenar informacion de genes
     GeneInfo *genes_array = malloc(capacity * sizeof(GeneInfo));
     if (!genes_array) {
-        printf("Error: Memory allocation failed.\n");
+        printf("Error: Asignacion de memoria fallida.\n");
         return;
     }
     
@@ -319,7 +399,7 @@ void cmd_max(BioSystem *sys) {
     char *gene_buffer = malloc(sys->gene_length + 1);
     if (!gene_buffer) {
         free(genes_array);
-        printf("Error: Memory allocation failed.\n");
+        printf("Error: Asignacion de memoria fallida.\n");
         return;
     }
     
@@ -328,7 +408,7 @@ void cmd_max(BioSystem *sys) {
     
     // Verificar si se encontraron genes
     if (count == 0) {
-        printf("No genes found in sequence.\n");
+        printf("No se encontraron genes en la secuencia.\n");
         free(gene_buffer);
         free(genes_array);
         return;
@@ -351,7 +431,7 @@ void cmd_max(BioSystem *sys) {
             // (Las posiciones están en orden inverso en la lista enlazada)
             int *positions_array = malloc(genes_array[i].frequency * sizeof(int));
             if (!positions_array) {
-                printf("\nError: Memory allocation failed for positions.\n");
+                printf("\nError: Asignacion de memoria fallida para las posiciones.\n");
                 continue;  // Saltar este gen
             }
             
@@ -363,7 +443,7 @@ void cmd_max(BioSystem *sys) {
                 current = current->next;
             }
             
-            // Ordenar las posiciones usando bubble sort
+            // Ordenar las posiciones usando bubble sort (mismo código de ordenamiento que usó Carlos)
             for (int j = 0; j < pos_count - 1; j++) {
                 for (int k = 0; k < pos_count - j - 1; k++) {
                     if (positions_array[k] > positions_array[k + 1]) {
@@ -398,7 +478,7 @@ void cmd_max(BioSystem *sys) {
 void cmd_min(BioSystem *sys) {
     // Verificar que el sistema este inicializado
     if (sys->root == NULL) {
-        printf("Error: Tree has not been initialized. Use 'start <m>'\n");
+        printf("Error: El arbol no ha sido inicializado. Usa 'start <m>'\n");
         return;
     }
     
@@ -409,7 +489,7 @@ void cmd_min(BioSystem *sys) {
     // Crear array dinamico para almacenar informacion de genes
     GeneInfo *genes_array = malloc(capacity * sizeof(GeneInfo));
     if (!genes_array) {
-        printf("Error: Memory allocation failed.\n");
+        printf("Error: Asignacion de memoria fallida.\n");
         return;
     }
     
@@ -417,7 +497,7 @@ void cmd_min(BioSystem *sys) {
     char *gene_buffer = malloc(sys->gene_length + 1);
     if (!gene_buffer) {
         free(genes_array);
-        printf("Error: Memory allocation failed.\n");
+        printf("Error: Asignacion de memoria fallida.\n");
         return;
     }
     
@@ -426,7 +506,7 @@ void cmd_min(BioSystem *sys) {
     
     // Verificar si se encontraron genes
     if (count == 0) {
-        printf("No genes found in sequence.\n");
+        printf("No se encontraron genes en la secuencia.\n");
         free(gene_buffer);
         free(genes_array);
         return;
@@ -456,7 +536,7 @@ void cmd_min(BioSystem *sys) {
             // (Las posiciones están en orden inverso en la lista enlazada)
             int *positions_array = malloc(genes_array[i].frequency * sizeof(int));
             if (!positions_array) {
-                printf("\nError: Memory allocation failed for positions.\n");
+                printf("\nError: Asignacion de memoria fallida para las posiciones.\n");
                 continue;  // Saltar este gen
             }
             

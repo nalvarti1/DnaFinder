@@ -10,7 +10,7 @@ int main(void) {
     printf("=== BioFinder ===\n");
     // Instrucciones para el usuario, cuando se implementen más comandos se agregaran aquí
     cmd_help();
-    printf("  Advace: try not use a trie of height more than 13, the initialized is slow\n\n");
+    printf("Precaucion: Intenta no usar un trie de tamaño mayor a 13, la inicialización es lenta\n\n");
 
     // Bucle principal para leer y procesar comandos
     while (1) {
