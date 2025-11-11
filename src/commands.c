@@ -394,8 +394,107 @@ void cmd_max(BioSystem *sys) {
 }
 
 //-------------------------------------------------------------------------------------------------------------------  
-// Mostrar el gen menos frecuente (Christoffer no implementado aún)
+// Mostrar el gen menos frecuente (Christoffer)
 void cmd_min(BioSystem *sys) {
-    // Implementación pendiente
-    printf("cmd_min not implemented yet.\n");
+    // Verificar que el sistema este inicializado
+    if (sys->root == NULL) {
+        printf("Error: Tree has not been initialized. Use 'start <m>'\n");
+        return;
+    }
+    
+    // Preparar estructuras para recolectar informacion
+    int capacity = 16;     // Capacidad inicial (se expandira si es necesario)
+    int count = 0;         // Contador de genes encontrados
+    
+    // Crear array dinamico para almacenar informacion de genes
+    GeneInfo *genes_array = malloc(capacity * sizeof(GeneInfo));
+    if (!genes_array) {
+        printf("Error: Memory allocation failed.\n");
+        return;
+    }
+    
+    // Crear buffer para construir strings de genes durante el recorrido
+    char *gene_buffer = malloc(sys->gene_length + 1);
+    if (!gene_buffer) {
+        free(genes_array);
+        printf("Error: Memory allocation failed.\n");
+        return;
+    }
+    
+    // Recorrer el arbol y recolectar todos los genes
+    collect_genes_recursive(sys->root, sys->gene_length, 0, gene_buffer, &genes_array, &count, &capacity);
+    
+    // Verificar si se encontraron genes
+    if (count == 0) {
+        printf("No genes found in sequence.\n");
+        free(gene_buffer);
+        free(genes_array);
+        return;
+    }
+    
+    // ------------------- INICIO DEL CAMBIO -------------------
+    // Encontrar la frecuencia minima
+    // (Se garantiza que count > 0 gracias al 'if' anterior)
+    
+    int min_frequency = genes_array[0].frequency;
+    
+    for (int i = 1; i < count; i++) { // Empezar en 1, ya que usamos el 0 para inicializar
+        if (genes_array[i].frequency < min_frequency) {
+            min_frequency = genes_array[i].frequency;
+        }
+    }
+    
+    // Imprimir todos los genes con frecuencia minima
+    for (int i = 0; i < count; i++) {
+        // Este es el segundo cambio: '==' min_frequency
+        if (genes_array[i].frequency == min_frequency) {
+            // ------------------- FIN DEL CAMBIO -------------------
+
+            printf("%s", genes_array[i].gene); // Imprimir el nombre del gen
+            
+            // Preparar array temporal para ordenar posiciones
+            // (Las posiciones están en orden inverso en la lista enlazada)
+            int *positions_array = malloc(genes_array[i].frequency * sizeof(int));
+            if (!positions_array) {
+                printf("\nError: Memory allocation failed for positions.\n");
+                continue;  // Saltar este gen
+            }
+            
+            // Copiar posiciones de la lista al array
+            Node *current = genes_array[i].positions->head;
+            int pos_count = 0;
+            while (current != NULL) {
+                positions_array[pos_count++] = current->pos;
+                current = current->next;
+            }
+            
+            // Ordenar las posiciones usando bubble sort
+            // (Este es el mismo código de ordenamiento que usó Carlos)
+            for (int j = 0; j < pos_count - 1; j++) {
+                for (int k = 0; k < pos_count - j - 1; k++) {
+                    if (positions_array[k] > positions_array[k + 1]) {
+                        int temp = positions_array[k];
+                        positions_array[k] = positions_array[k + 1];
+                        positions_array[k + 1] = temp;
+                    }
+                }
+            }
+            
+            // Imprimir las posiciones ordenadas
+            for (int j = 0; j < pos_count; j++) {
+                printf(" %d", positions_array[j]);
+            }
+            printf("\n");
+            
+            // Liberar array temporal de posiciones
+            free(positions_array);
+        }
+    }
+    
+    // Liberar toda la memoria asignada
+    for (int i = 0; i < count; i++) {
+        free(genes_array[i].gene);
+    }
+    free(genes_array);
+    free(gene_buffer);
 }
