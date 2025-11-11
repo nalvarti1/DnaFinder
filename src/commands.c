@@ -5,6 +5,14 @@
 #include "../incs/trie.h"
 #include "../incs/file_utils.h"
 
+
+// Estructura auxiliar para almacenar informacion de cada gen encontrado
+typedef struct GeneInfo {
+    char *gene;           // String del gen (ej: "AA", "ACGT")
+    int frequency;        // Cuantas veces aparece en la secuencia
+    List *positions;      // Puntero a la lista de posiciones
+} GeneInfo;
+
 // Procesa el comando ingresado por el usuario: "start <m>", etc.
 // En src/commands.c
 
@@ -214,11 +222,175 @@ void cmd_all(BioSystem *sys) {
     printf("cmd_all not implemented yet.\n");
 }
 
+
 //-------------------------------------------------------------------------------------------------------------------
-// Mostrar el gen más frecuente (Carlos no implementado aún)
+// Funcion auxiliar recursiva para recorrer el arbol y recolectar todos los genes (Carlos)
+//-------------------------------------------------------------------------------------------------------------------
+void collect_genes_recursive(
+    TrieNode *node,           // Nodo actual en el recorrido
+    int depth,                // Profundidad total del arbol (tamaño del gen)
+    int current_depth,        // Profundidad actual en el recorrido
+    char *gene_buffer,        // Buffer para construir el string del gen
+    GeneInfo **genes_array,   // Array dinamico para almacenar genes encontrados
+    int *count,               // Contador de genes encontrados
+    int *capacity             // Capacidad actual del array
+) {
+    // CASO BASE: Llegamos a una hoja (profundidad completa)
+    if (current_depth == depth) {
+        // Verificar si esta hoja tiene posiciones (el gen existe en la secuencia)
+        if (node->positions && node->positions->count > 0) {
+            // Terminar el string del gen
+            gene_buffer[current_depth] = '\0';
+            
+            // Expandir el array si esta lleno
+            if (*count >= *capacity) {
+                *capacity *= 2;  // Duplicar capacidad
+                *genes_array = realloc(*genes_array, (*capacity) * sizeof(GeneInfo));
+                if (!(*genes_array)) {
+                    printf("Error: Memory reallocation failed.\n");
+                    return;
+                }
+            }
+            
+            // Guardar la informacion del gen en el array
+            (*genes_array)[*count].gene = malloc(depth + 1);
+            if (!(*genes_array)[*count].gene) {
+                printf("Error: Memory allocation failed for gene string.\n");
+                return;
+            }
+            strcpy((*genes_array)[*count].gene, gene_buffer);
+            (*genes_array)[*count].frequency = node->positions->count;
+            (*genes_array)[*count].positions = node->positions;
+            (*count)++;
+        }
+        return;  // Salir de la recursion
+    }
+    
+    // CASO RECURSIVO: Explorar los 4 posibles hijos
+    
+    // Explorar hijo A
+    if (node->hijoA) {
+        gene_buffer[current_depth] = 'A';
+        collect_genes_recursive(node->hijoA, depth, current_depth + 1, gene_buffer, genes_array, count, capacity);
+    }
+    
+    // Explorar hijo C
+    if (node->hijoC) {
+        gene_buffer[current_depth] = 'C';
+        collect_genes_recursive(node->hijoC, depth, current_depth + 1, gene_buffer, genes_array, count, capacity);
+    }
+    
+    // Explorar hijo G
+    if (node->hijoG) {
+        gene_buffer[current_depth] = 'G';
+        collect_genes_recursive(node->hijoG, depth, current_depth + 1, gene_buffer, genes_array, count, capacity);
+    }
+    
+    // Explorar hijo T
+    if (node->hijoT) {
+        gene_buffer[current_depth] = 'T';
+        collect_genes_recursive(node->hijoT, depth, current_depth + 1, gene_buffer, genes_array, count, capacity);
+    }
+}
+
+
+//-------------------------------------------------------------------------------------------------------------------
+// Mostrar el gen mas frecuente (Carlos)
+//-------------------------------------------------------------------------------------------------------------------
 void cmd_max(BioSystem *sys) {
-    // Implementación pendiente
-    printf("cmd_max not implemented yet.\n");
+    // Verificar que el sistema este inicializado
+    if (sys->root == NULL) {
+        printf("Error: Tree has not been initialized. Use 'start <m>'\n");
+        return;
+    }
+    
+    // Preparar estructuras para recolectar informacion
+    int capacity = 16;     // Capacidad inicial (se expandira si es necesario)
+    int count = 0;         // Contador de genes encontrados
+    
+    // Crear array dinamico para almacenar informacion de genes
+    GeneInfo *genes_array = malloc(capacity * sizeof(GeneInfo));
+    if (!genes_array) {
+        printf("Error: Memory allocation failed.\n");
+        return;
+    }
+    
+    // Crear buffer para construir strings de genes durante el recorrido
+    char *gene_buffer = malloc(sys->gene_length + 1);
+    if (!gene_buffer) {
+        free(genes_array);
+        printf("Error: Memory allocation failed.\n");
+        return;
+    }
+    
+    // Recorrer el arbol y recolectar todos los genes
+    collect_genes_recursive(sys->root, sys->gene_length, 0, gene_buffer, &genes_array, &count, &capacity);
+    
+    // Verificar si se encontraron genes
+    if (count == 0) {
+        printf("No genes found in sequence.\n");
+        free(gene_buffer);
+        free(genes_array);
+        return;
+    }
+    
+    // Encontrar la frecuencia maxima
+    int max_frequency = 0;
+    for (int i = 0; i < count; i++) {
+        if (genes_array[i].frequency > max_frequency) {
+            max_frequency = genes_array[i].frequency;
+        }
+    }
+    
+    // Imprimir todos los genes con frecuencia maxima
+    for (int i = 0; i < count; i++) {
+        if (genes_array[i].frequency == max_frequency) {
+            printf("%s", genes_array[i].gene); // Imprimir el nombre del gen
+            
+            // Preparar array temporal para ordenar posiciones
+            // (Las posiciones están en orden inverso en la lista enlazada)
+            int *positions_array = malloc(genes_array[i].frequency * sizeof(int));
+            if (!positions_array) {
+                printf("\nError: Memory allocation failed for positions.\n");
+                continue;  // Saltar este gen
+            }
+            
+            // Copiar posiciones de la lista al array
+            Node *current = genes_array[i].positions->head;
+            int pos_count = 0;
+            while (current != NULL) {
+                positions_array[pos_count++] = current->pos;
+                current = current->next;
+            }
+            
+            // Ordenar las posiciones usando bubble sort
+            for (int j = 0; j < pos_count - 1; j++) {
+                for (int k = 0; k < pos_count - j - 1; k++) {
+                    if (positions_array[k] > positions_array[k + 1]) {
+                        int temp = positions_array[k];
+                        positions_array[k] = positions_array[k + 1];
+                        positions_array[k + 1] = temp;
+                    }
+                }
+            }
+            
+            // Imprimir las posiciones ordenadas
+            for (int j = 0; j < pos_count; j++) {
+                printf(" %d", positions_array[j]);
+            }
+            printf("\n");
+            
+            // Liberar array temporal de posiciones
+            free(positions_array);
+        }
+    }
+    
+    // Liberar toda la memoria asignada
+    for (int i = 0; i < count; i++) {
+        free(genes_array[i].gene);
+    }
+    free(genes_array);
+    free(gene_buffer);
 }
 
 //-------------------------------------------------------------------------------------------------------------------  
