@@ -50,7 +50,7 @@ TrieNode *create_trie(int depth) {
 
 // Libera el árbol (Versión más robusta)
 void free_trie(TrieNode *root, int depth) {
-    // (El parámetro 'depth' ya no es necesario, pero lo dejamos por consistencia)
+    // dejamos int depht para mantener la funcionalidad de las llamadas, pero no lo usamos aquí 
     if (!root) return;
     
     // Primero, libera a todos los hijos

@@ -52,3 +52,23 @@ Proyecto de búsqueda de genes usando árboles 4-arios (tries) en lenguaje C.
 # Problemas principales a resolver
 - Manejo en la logica funtamental de la creacion del arbol:
     - 
+
+# Ciclo basico del funcionamiento del programa
+- Opciones de Compilacion
+    - make
+    - gcc -Wall -Wextra -std=c11 -Iincs src\main.c src\bio.c src\trie.c src\list.c src\commands.c src\file_utils.c -o bio
+- Ejecucion del programa
+    - En terminal MINGW64 (si usaste make): ./bio
+    - En terminal PowerShell/CMD de Windows: .\bio.exe
+- Flujo de ejemplo de uso
+    1. Iniciar el programa: ./bio
+    2. Crear el árbol: >bio start <m>
+        - Ejemplo: >bio start 2 (Crea un árbol para genes de largo 2)
+    3. Cargar la secuencia S: >bio read <archivo>
+        - Ejemplo: >bio read data/adn.txt (Lee el archivo y lo carga en el árbol)
+    4. Realizar consultas:
+        - >bio search <gen> (Ej: >bio search TA)
+        - >bio all
+        - >bio max
+        - >bio min
+    5. Salir del programa: >bio exit
